@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tire Inspection Form</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRpcmUgSW5zcGVjdGlvbiBGb3JtIiwKICAic2hvcnRfbmFtZSI6ICJUaXJlIEZvcm0iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiMyNTYzZWIiLAogICJpY29ucyI6IFtdCn0=">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        .pending-count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.125rem 0.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+        }
+
+        .tech-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-size: 0.9375rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        input.input-error,
+        select.input-error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .field-error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .date-persist-notice {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .vehicle-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .vehicle-option {
+            padding: 1.5rem;
+            border: 3px solid #e5e7eb;
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .vehicle-option:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .vehicle-option.active {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+
+        .vehicle-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .vehicle-label {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1.125rem;
+        }
+
+        .vehicle-positions {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            background: #f3f4f6;
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+        }
+
+        .view-toggle button {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-toggle button.active {
+            background: white;
+            color: #2563eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .visual-diagram {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .diagram-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .truck-diagram, .trailer-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .axle-group {
+            width: 100%;
+        }
+
+        .axle-label {
+            text-align: center;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .axle {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .axle::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 3px;
+            background: #d1d5db;
+            z-index: 0;
+        }
+
+        .tire-side {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .side-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .tire-visual {
+            width: 70px;
+            height: 90px;
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border-radius: 8px;
+            border: 3px solid #6b7280;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tire-visual:hover {
+            transform: scale(1.05);
+            border-color: #2563eb;
+        }
+
+        .tire-visual.status-green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+        }
+
+        .tire-visual.status-yellow {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-color: #f59e0b;
+        }
+
+        .tire-visual.status-red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #ef4444;
+        }
+
+        .tire-visual.has-data {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border-color: #2563eb;
+        }
+
+        .tire-number {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .tire-status-icon {
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .tire-position {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f9fafb;
+        }
+
+        .tire-position.status-green {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .tire-position.status-yellow {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .tire-position.status-red {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .tire-position h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .position-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .position-header::before {
+            content: '';
+            width: 4px;
+            height: 1rem;
+            background: #2563eb;
+            border-radius: 2px;
+        }
+
+        .tire-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .status-indicator-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: auto;
+        }
+
+        .status-indicator-text.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-indicator-text.yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-indicator-text.red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .photo-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .photo-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #f3f4f6;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .photo-button:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 2px solid #e5e7eb;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .photo-count {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .button-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .button-primary:active {
+            background: #1e40af;
+            transform: scale(0.98);
+        }
+
+        .button-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .button-secondary:active {
+            background: #f9fafb;
+        }
+
+        .button-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .button-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9375rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #2563eb;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-unit {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1rem;
+        }
+
+        .history-details {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .sync-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .sync-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .sync-badge.synced {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .sync-badge.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+
+        .empty-state svg {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1rem;
+            opacity: 0.3;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+        }
+
+        .settings-section h3 {
+            color: #1f2937;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .settings-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item label {
+            margin-bottom: 0.25rem;
+        }
+
+        .settings-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .editable-list {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .editable-list-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .editable-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .editable-list-item input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .editable-list-item button {
+            padding: 0.5rem;
+            border: none;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .add-item-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .add-item-row input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .add-item-row button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: #2563eb;
+            color: white;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid;
+        }
+
+        .legend-box.empty {
+            background: #374151;
+            border-color: #6b7280;
+        }
+
+        .legend-box.green {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .legend-box.yellow {
+            background: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .legend-box.red {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            color: #1f2937;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .validation-error {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .collapsible-header:hover {
+            color: #2563eb;
+        }
+
+        .collapsible-content {
+            display: none;
+            padding-top: 0.5rem;
+        }
+
+        .collapsible-content.open {
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            .tire-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .status-bar {
+                font-size: 0.8125rem;
+            }
+
+            .axle {
+                gap: 1.5rem;
+            }
+
+            .tire-visual {
+                width: 60px;
+                height: 80px;
+            }
+
+            .vehicle-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚛 Tire Inspection Form</h1>
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Online</span>
+            </div>
+            <div class="tech-badge" id="techBadge" style="display: none;">
+                <span id="techName"></span>
+            </div>
+            <div class="pending-count" id="pendingCount" style="display: none;">
+                0 pending
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" id="tabForm" onclick="switchTab('form', this)">Inspection</button>
+            <button class="tab" id="tabHistory" onclick="switchTab('history', this)">History</button>
+            <button class="tab" id="tabSettings" onclick="switchTab('settings', this)">Settings</button>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Form Tab -->
+        <div id="formTab" class="tab-content active">
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem; color: #1f2937;">Inspection Details</h2>
+                
+                <div class="form-group">
+                    <label for="inspectionDate">Inspection Date *</label>
+                    <input type="date" id="inspectionDate">
+                    <p class="date-persist-notice">Date will be remembered for subsequent inspections</p>
+                    <p class="field-error" id="inspectionDateError"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="technicianName">Technician Name *</label>
+                    <input type="text" id="technicianName" placeholder="Your name">
+                    <p class="field-error" id="technicianNameError"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="shop">Shop Location *</label>
+                    <select id="shop">
+                        <option value="">Select Shop...</option>
+                    </select>
+                    <p class="field-error" id="shopError"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="unitNumber">Unit Number *</label>
+                    <input type="text" id="unitNumber" placeholder="e.g., 320568">
+                    <p class="field-error" id="unitNumberError"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="stickerShop">Sticker Shop</label>
+                    <select id="stickerShop" onchange="handleStickerShopChange()">
+                        <option value="">Select...</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="stickerDateGroup">
+                    <label for="stickerDate">Inflation Sticker Date</label>
+                    <input type="date" id="stickerDate">
+                    <p class="field-error" id="stickerDateError"></p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 1rem; color: #1f2937;">Select Vehicle Type</h2>
+                
+                <div class="vehicle-selector">
+                    <div class="vehicle-option active" id="tractorOption" onclick="selectVehicle('tractor')">
+                        <div class="vehicle-icon">🚛</div>
+                        <div class="vehicle-label">TRACTOR</div>
+                        <div class="vehicle-positions">Positions 1-10</div>
+                    </div>
+                    <div class="vehicle-option" id="trailerOption" onclick="selectVehicle('trailer')">
+                        <div class="vehicle-icon">🚚</div>
+                        <div class="vehicle-label">TRAILER</div>
+                        <div class="vehicle-positions">Positions 11-18</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 1rem; color: #1f2937;">Tire Positions</h2>
+                
+                <div class="view-toggle">
+                    <button type="button" id="visualViewBtn" class="active" onclick="switchView('visual')">
+                        🔍 Visual View
+                    </button>
+                    <button type="button" id="gridViewBtn" onclick="switchView('grid')">
+                        📋 List View
+                    </button>
+                </div>
+
+                <!-- Visual Diagram View -->
+                <div id="visualView" class="visual-diagram">
+                    <div class="diagram-header">Click tire positions to enter data</div>
+                    
+                    <!-- TRACTOR DIAGRAM -->
+                    <div id="tractorDiagram" class="truck-diagram">
+                        <!-- Steer Axle -->
+                        <div class="axle-group">
+                            <div class="axle-label">STEER AXLE</div>
+                            <div class="axle">
+                                <div class="tire-side">
+                                    <div class="side-label">DRIVER</div>
+                                    <div class="tire-visual" onclick="openTireModal(1)" id="tire-visual-1">
+                                        <div class="tire-number">1</div>
+                                        <div class="tire-status-icon" id="tire-icon-1"></div>
+                                    </div>
+                                </div>
+                                <div class="tire-side">
+                                    <div class="side-label">PASSENGER</div>
+                                    <div class="tire-visual" onclick="openTireModal(2)" id="tire-visual-2">
+                                        <div class="tire-number">2</div>
+                                        <div class="tire-status-icon" id="tire-icon-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Drive Axle 1 -->
+                        <div class="axle-group">
+                            <div class="axle-label">DRIVE AXLE 1</div>
+                            <div class="axle">
+                                <div class="tire-side">
+                                    <div class="side-label">DRIVER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(3)" id="tire-visual-3">
+                                            <div class="tire-number">3</div>
+                                            <div class="tire-status-icon" id="tire-icon-3"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(4)" id="tire-visual-4">
+                                            <div class="tire-number">4</div>
+                                            <div class="tire-status-icon" id="tire-icon-4"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tire-side">
+                                    <div class="side-label">PASSENGER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(5)" id="tire-visual-5">
+                                            <div class="tire-number">5</div>
+                                            <div class="tire-status-icon" id="tire-icon-5"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(6)" id="tire-visual-6">
+                                            <div class="tire-number">6</div>
+                                            <div class="tire-status-icon" id="tire-icon-6"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Drive Axle 2 -->
+                        <div class="axle-group">
+                            <div class="axle-label">DRIVE AXLE 2</div>
+                            <div class="axle">
+                                <div class="tire-side">
+                                    <div class="side-label">DRIVER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(7)" id="tire-visual-7">
+                                            <div class="tire-number">7</div>
+                                            <div class="tire-status-icon" id="tire-icon-7"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(8)" id="tire-visual-8">
+                                            <div class="tire-number">8</div>
+                                            <div class="tire-status-icon" id="tire-icon-8"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tire-side">
+                                    <div class="side-label">PASSENGER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(9)" id="tire-visual-9">
+                                            <div class="tire-number">9</div>
+                                            <div class="tire-status-icon" id="tire-icon-9"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(10)" id="tire-visual-10">
+                                            <div class="tire-number">10</div>
+                                            <div class="tire-status-icon" id="tire-icon-10"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TRAILER DIAGRAM -->
+                    <div id="trailerDiagram" class="trailer-diagram" style="display: none;">
+                        <!-- Trailer Axle 1 -->
+                        <div class="axle-group">
+                            <div class="axle-label">TRAILER AXLE 1</div>
+                            <div class="axle">
+                                <div class="tire-side">
+                                    <div class="side-label">DRIVER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(11)" id="tire-visual-11">
+                                            <div class="tire-number">11</div>
+                                            <div class="tire-status-icon" id="tire-icon-11"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(12)" id="tire-visual-12">
+                                            <div class="tire-number">12</div>
+                                            <div class="tire-status-icon" id="tire-icon-12"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tire-side">
+                                    <div class="side-label">PASSENGER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(13)" id="tire-visual-13">
+                                            <div class="tire-number">13</div>
+                                            <div class="tire-status-icon" id="tire-icon-13"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(14)" id="tire-visual-14">
+                                            <div class="tire-number">14</div>
+                                            <div class="tire-status-icon" id="tire-icon-14"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trailer Axle 2 -->
+                        <div class="axle-group">
+                            <div class="axle-label">TRAILER AXLE 2</div>
+                            <div class="axle">
+                                <div class="tire-side">
+                                    <div class="side-label">DRIVER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(15)" id="tire-visual-15">
+                                            <div class="tire-number">15</div>
+                                            <div class="tire-status-icon" id="tire-icon-15"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(16)" id="tire-visual-16">
+                                            <div class="tire-number">16</div>
+                                            <div class="tire-status-icon" id="tire-icon-16"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tire-side">
+                                    <div class="side-label">PASSENGER</div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="tire-visual" onclick="openTireModal(17)" id="tire-visual-17">
+                                            <div class="tire-number">17</div>
+                                            <div class="tire-status-icon" id="tire-icon-17"></div>
+                                        </div>
+                                        <div class="tire-visual" onclick="openTireModal(18)" id="tire-visual-18">
+                                            <div class="tire-number">18</div>
+                                            <div class="tire-status-icon" id="tire-icon-18"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-box empty"></div>
+                            <span>No Data</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box green"></div>
+                            <span>Good</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box yellow"></div>
+                            <span>Warning</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box red"></div>
+                            <span>Critical</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid View -->
+                <div id="gridView" style="display: none;">
+                    <div id="tirePositions">
+                        <!-- Tire positions will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 1rem; color: #1f2937;">Photos</h2>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">
+                    Add photos of tires for documentation
+                </p>
+                
+                <div class="photo-upload">
+                    <input type="file" id="photoInput" accept="image/*" capture="environment" multiple style="display: none;">
+                    <label for="photoInput" class="photo-button">
+                        <span>📸</span>
+                        <span>Take/Upload Photos</span>
+                    </label>
+                    <div class="photo-preview" id="photoPreview"></div>
+                    <div class="photo-count" id="photoCount"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="4" placeholder="Additional observations..."></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="button button-secondary" onclick="resetForm()">Clear Form</button>
+                <button type="button" class="button button-primary" id="saveButton" onclick="saveInspection()">
+                    Save Inspection
+                </button>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="historyTab" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="color: #1f2937;">Inspection History</h2>
+                    <button class="button button-success" onclick="syncData()" style="width: auto; padding: 0.5rem 1rem;">
+                        <span id="syncButtonText">Sync All</span>
+                    </button>
+                </div>
+                <div id="historyList"></div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settingsTab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem; color: #1f2937;">Settings</h2>
+                
+                <div class="settings-section">
+                    <h3>🔗 Google Sheet Connection</h3>
+                    <div class="settings-item">
+                        <label for="googleSheetUrl">Google Sheet URL</label>
+                        <input type="text" id="googleSheetUrl" placeholder="Paste your Google Apps Script URL here">
+                        <p class="settings-description">
+                            The URL of your Google Apps Script Web App that will receive the data.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🏪 Shop Locations</h3>
+                    <p class="settings-description">Edit the list of shop locations available in the dropdown.</p>
+                    <div class="editable-list" id="shopList"></div>
+                    <div class="add-item-row">
+                        <input type="text" id="newShopInput" placeholder="Add new shop...">
+                        <button onclick="addShop()">Add</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🏷️ Sticker Shop Options</h3>
+                    <p class="settings-description">Edit the list of sticker shop options.</p>
+                    <div class="editable-list" id="stickerShopList"></div>
+                    <div class="add-item-row">
+                        <input type="text" id="newStickerShopInput" placeholder="Add new sticker shop...">
+                        <button onclick="addStickerShop()">Add</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🚛 Steer Tire Models (Positions 1-2)</h3>
+                    <p class="settings-description">Tire models for steer axle positions.</p>
+                    <div class="editable-list" id="steerModelList"></div>
+                    <div class="add-item-row">
+                        <input type="text" id="newSteerModelInput" placeholder="Add new model...">
+                        <button onclick="addSteerModel()">Add</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🚛 Drive Tire Models (Positions 3-10)</h3>
+                    <p class="settings-description">Tire models for drive axle positions.</p>
+                    <div class="editable-list" id="driveModelList"></div>
+                    <div class="add-item-row">
+                        <input type="text" id="newDriveModelInput" placeholder="Add new model...">
+                        <button onclick="addDriveModel()">Add</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🚚 Trailer Tire Models (Positions 11-18)</h3>
+                    <p class="settings-description">Tire models for trailer positions.</p>
+                    <div class="editable-list" id="trailerModelList"></div>
+                    <div class="add-item-row">
+                        <input type="text" id="newTrailerModelInput" placeholder="Add new model...">
+                        <button onclick="addTrailerModel()">Add</button>
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <button class="button button-primary" onclick="saveSettingsManual()">
+                        Save All Settings
+                    </button>
+                </div>
+
+                <div class="settings-item">
+                    <button class="button button-danger" onclick="clearAllData()">
+                        Clear All Local Data
+                    </button>
+                    <p class="settings-description">
+                        Warning: This will delete all unsaved inspections from your device.
+                    </p>
+                </div>
+
+                <div class="settings-item">
+                    <button class="button button-secondary" onclick="resetToDefaults()">
+                        Reset Dropdowns to Defaults
+                    </button>
+                    <p class="settings-description">
+                        Restore all dropdown options to their original values.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Tire Data Entry -->
+    <div id="tireModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Position 1</h3>
+                <button class="modal-close" onclick="closeTireModal()">×</button>
+            </div>
+            
+            <div id="modalContent">
+                <!-- Content will be populated dynamically -->
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                <button type="button" onclick="closeTireModal()" class="button button-secondary">Close</button>
+                <button type="button" onclick="saveTireData()" class="button button-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default dropdown options
+        const defaultShops = [
+            'CONKLIN',
+            'CROMWELL',
+            'DENTON',
+            'DOVER',
+            'EAST DUBUQUE',
+            'INDIANAPOLIS',
+            'JOLIET',
+            'KANSAS CITY',
+            'MEMPHIS',
+            'MONMOUTH',
+            'SAPULPA',
+            'SPRINGFIELD'
+        ];
+
+        const defaultStickerShops = [
+            'Blank Sticker',
+            'No Sticker',
+            'CON',
+            'CRO',
+            'DEN',
+            'DOV',
+            'EDU',
+            'IND',
+            'JOL',
+            'KCK',
+            'MEM',
+            'MON',
+            'SAP',
+            'SPR'
+        ];
+
+        const defaultSteerModels = [
+            'XLEZ+ New',
+            'XLEZ New',
+            'RY617 New',
+            'XZE2 New',
+            'XMEZ2 New',
+            'OTHER'
+        ];
+
+        const defaultDriveModels = [
+            'XLED Retread',
+            'XLED New',
+            'XLED+ New',
+            'XDN2 New',
+            'XDN2 Retread',
+            'OTHER'
+        ];
+
+        const defaultTrailerModels = [
+            'XLET Retread',
+            'VANTAGE TRAILER II Retread',
+            'XT-1 Retread',
+            'XLET New',
+            'XLET2 New',
+            'OTHER'
+        ];
+
+        // App State
+        let inspections = [];
+        let settings = {
+            googleSheetUrl: '',
+            technicianName: '',
+            inspectionDate: '',
+            shopLocation: '',
+            shops: [...defaultShops],
+            stickerShops: [...defaultStickerShops],
+            steerModels: [...defaultSteerModels],
+            driveModels: [...defaultDriveModels],
+            trailerModels: [...defaultTrailerModels]
+        };
+        let photos = [];
+        let currentView = 'visual';
+        let currentVehicle = 'tractor';
+        let currentModalPosition = null;
+
+        // Tire data storage
+        let tireData = {};
+
+        // Position labels
+        const positionLabels = {
+            1: 'Steer - Driver',
+            2: 'Steer - Passenger',
+            3: 'Drive 1 - Driver Outer',
+            4: 'Drive 1 - Driver Inner',
+            5: 'Drive 1 - Passenger Outer',
+            6: 'Drive 1 - Passenger Inner',
+            7: 'Drive 2 - Driver Outer',
+            8: 'Drive 2 - Driver Inner',
+            9: 'Drive 2 - Passenger Outer',
+            10: 'Drive 2 - Passenger Inner',
+            11: 'Trailer Axle 1 - Driver Outer',
+            12: 'Trailer Axle 1 - Driver Inner',
+            13: 'Trailer Axle 1 - Passenger Outer',
+            14: 'Trailer Axle 1 - Passenger Inner',
+            15: 'Trailer Axle 2 - Driver Outer',
+            16: 'Trailer Axle 2 - Driver Inner',
+            17: 'Trailer Axle 2 - Passenger Outer',
+            18: 'Trailer Axle 2 - Passenger Inner'
+        };
+
+        // PSI Status logic
+        function getPsiStatus(psi) {
+            const p = parseInt(psi);
+            if (isNaN(p) || psi === '') return null;
+            if (p >= 0 && p <= 80) return { status: 'red', label: 'Flat' };
+            if (p >= 81 && p <= 96) return { status: 'yellow', label: 'Under Inflated' };
+            if (p >= 97 && p <= 112) return { status: 'green', label: 'Properly Inflated' };
+            if (p >= 113 && p <= 128) return { status: 'yellow', label: 'Over Inflated' };
+            if (p >= 129) return { status: 'red', label: 'Dangerously Over Inflated' };
+            return null;
+        }
+
+        // Depth Status logic based on position
+        function getDepthStatus(depth, position) {
+            const d = parseInt(depth);
+            if (isNaN(d) || depth === '') return null;
+            
+            // Steer positions (1-2)
+            if (position === 1 || position === 2) {
+                if (d >= 0 && d <= 6) return { status: 'red', label: 'Replace' };
+                if (d >= 7 && d <= 24) return { status: 'green', label: 'Good' };
+                if (d >= 25) return { status: 'invalid', label: 'Invalid (max 24)' };
+            }
+            // Drive positions (3-10) and Trailer positions (11-18)
+            else {
+                if (d >= 0 && d <= 4) return { status: 'red', label: 'Replace' };
+                if (d >= 5 && d <= 6) return { status: 'yellow', label: 'Monitor' };
+                if (d >= 7 && d <= 32) return { status: 'green', label: 'Good' };
+                if (d >= 33) return { status: 'invalid', label: 'Invalid (max 32)' };
+            }
+            return null;
+        }
+
+        // Get max depth for position
+        function getMaxDepth(position) {
+            if (position === 1 || position === 2) return 24;
+            return 32;
+        }
+
+        // Get overall tire status (worst of PSI and Depth)
+        function getTireStatus(position) {
+            const data = tireData[position];
+            if (!data) return null;
+            
+            const psiStatus = getPsiStatus(data.psi);
+            const depthStatus = getDepthStatus(data.depth, position);
+            
+            // If either is invalid, return that
+            if (psiStatus?.status === 'invalid' || depthStatus?.status === 'invalid') {
+                return 'red';
+            }
+            
+            // Return worst status
+            if (psiStatus?.status === 'red' || depthStatus?.status === 'red') return 'red';
+            if (psiStatus?.status === 'yellow' || depthStatus?.status === 'yellow') return 'yellow';
+            if (psiStatus?.status === 'green' || depthStatus?.status === 'green') return 'green';
+            
+            // Has data but no status (e.g., only model entered)
+            if (data.psi || data.depth || data.model) return 'blue';
+            
+            return null;
+        }
+
+        // Get tire models for position
+        function getModelsForPosition(position) {
+            if (position === 1 || position === 2) {
+                return settings.steerModels || defaultSteerModels;
+            } else if (position >= 3 && position <= 10) {
+                return settings.driveModels || defaultDriveModels;
+            } else {
+                return settings.trailerModels || defaultTrailerModels;
+            }
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initializing...');
+            loadSettings();
+            loadInspections();
+            initializeDate();
+            populateDropdowns();
+            renderSettingsLists();
+            initializeTirePositions();
+            updateHistoryDisplay();
+            updateOnlineStatus();
+            updateTechBadge();
+            
+            // Listen for online/offline events
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            // Auto-sync when coming online
+            window.addEventListener('online', () => {
+                setTimeout(() => syncData(), 1000);
+            });
+
+            // Technician name tracking
+            document.getElementById('technicianName').addEventListener('change', function() {
+                settings.technicianName = this.value;
+                saveSettings();
+                updateTechBadge();
+            });
+            
+            // Inspection date tracking
+            document.getElementById('inspectionDate').addEventListener('change', function() {
+                settings.inspectionDate = this.value;
+                saveSettings();
+            });
+
+            // Shop location tracking
+            document.getElementById('shop').addEventListener('change', function() {
+                settings.shopLocation = this.value;
+                saveSettings();
+            });
+
+            // Photo handling
+            document.getElementById('photoInput').addEventListener('change', handlePhotoSelect);
+            
+            console.log('App initialized successfully');
+        });
+
+        function populateDropdowns() {
+            // Populate shop dropdown
+            const shopSelect = document.getElementById('shop');
+            shopSelect.innerHTML = '<option value="">Select Shop...</option>';
+            (settings.shops || defaultShops).forEach(shop => {
+                const option = document.createElement('option');
+                option.value = shop;
+                option.textContent = shop;
+                shopSelect.appendChild(option);
+            });
+            
+            // Restore selected shop
+            if (settings.shopLocation) {
+                shopSelect.value = settings.shopLocation;
+            }
+
+            // Populate sticker shop dropdown
+            const stickerShopSelect = document.getElementById('stickerShop');
+            stickerShopSelect.innerHTML = '<option value="">Select...</option>';
+            (settings.stickerShops || defaultStickerShops).forEach(shop => {
+                const option = document.createElement('option');
+                option.value = shop;
+                option.textContent = shop;
+                stickerShopSelect.appendChild(option);
+            });
+        }
+
+        function handleStickerShopChange() {
+            const stickerShop = document.getElementById('stickerShop').value;
+            const stickerDateGroup = document.getElementById('stickerDateGroup');
+            const stickerDateInput = document.getElementById('stickerDate');
+            
+            // Hide date field if Blank Sticker or No Sticker selected
+            if (stickerShop === 'Blank Sticker' || stickerShop === 'No Sticker') {
+                stickerDateGroup.style.display = 'none';
+                stickerDateInput.value = '';
+            } else {
+                stickerDateGroup.style.display = 'block';
+            }
+        }
+
+        function initializeDate() {
+            const dateInput = document.getElementById('inspectionDate');
+            if (settings.inspectionDate) {
+                dateInput.value = settings.inspectionDate;
+            } else {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+                settings.inspectionDate = today;
+                saveSettings();
+            }
+        }
+
+        function selectVehicle(vehicle) {
+            currentVehicle = vehicle;
+            
+            document.getElementById('tractorOption').classList.toggle('active', vehicle === 'tractor');
+            document.getElementById('trailerOption').classList.toggle('active', vehicle === 'trailer');
+            
+            document.getElementById('tractorDiagram').style.display = vehicle === 'tractor' ? 'flex' : 'none';
+            document.getElementById('trailerDiagram').style.display = vehicle === 'trailer' ? 'flex' : 'none';
+            
+            // Reinitialize list view positions for selected vehicle
+            initializeTirePositions();
+            
+            updateVisualDiagram();
+        }
+
+        function switchView(view) {
+            currentView = view;
+            
+            if (view === 'visual') {
+                document.getElementById('visualView').style.display = 'block';
+                document.getElementById('gridView').style.display = 'none';
+                document.getElementById('visualViewBtn').classList.add('active');
+                document.getElementById('gridViewBtn').classList.remove('active');
+                updateVisualDiagram();
+            } else {
+                document.getElementById('visualView').style.display = 'none';
+                document.getElementById('gridView').style.display = 'block';
+                document.getElementById('visualViewBtn').classList.remove('active');
+                document.getElementById('gridViewBtn').classList.add('active');
+            }
+        }
+
+        function switchTab(tabName, clickedTab) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            clickedTab.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function openTireModal(position) {
+            currentModalPosition = position;
+            const modal = document.getElementById('tireModal');
+            const title = document.getElementById('modalTitle');
+            const content = document.getElementById('modalContent');
+            
+            title.textContent = `Position ${position}: ${positionLabels[position] || ''}`;
+            
+            const existing = tireData[position] || { psi: '', depth: '', model: '' };
+            const models = getModelsForPosition(position);
+            const maxDepth = getMaxDepth(position);
+            
+            let modelOptions = '<option value="">Select Model...</option>';
+            models.forEach(m => {
+                const selected = existing.model === m ? 'selected' : '';
+                modelOptions += `<option value="${m}" ${selected}>${m}</option>`;
+            });
+            
+            content.innerHTML = `
+                <div class="form-group">
+                    <label>PSI</label>
+                    <input type="number" id="modal-psi" value="${existing.psi}" min="0" max="999" placeholder="PSI" onchange="updateModalStatus()">
+                    <div id="psi-status"></div>
+                </div>
+                <div class="form-group">
+                    <label>Depth (32nds) - Max: ${maxDepth}</label>
+                    <input type="number" id="modal-depth" value="${existing.depth}" min="0" max="${maxDepth}" placeholder="Depth" onchange="updateModalStatus()">
+                    <div id="depth-status"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Model</label>
+                    <select id="modal-model">
+                        ${modelOptions}
+                    </select>
+                </div>
+            `;
+            
+            modal.classList.add('show');
+            updateModalStatus();
+        }
+
+        function updateModalStatus() {
+            const psi = document.getElementById('modal-psi').value;
+            const depth = document.getElementById('modal-depth').value;
+            const position = currentModalPosition;
+            
+            // Update PSI status
+            const psiStatusEl = document.getElementById('psi-status');
+            const psiStatus = getPsiStatus(psi);
+            if (psiStatus) {
+                psiStatusEl.innerHTML = `<span class="status-indicator-text ${psiStatus.status}">${psiStatus.label}</span>`;
+            } else {
+                psiStatusEl.innerHTML = '';
+            }
+            
+            // Update Depth status
+            const depthStatusEl = document.getElementById('depth-status');
+            const depthStatus = getDepthStatus(depth, position);
+            if (depthStatus) {
+                const statusClass = depthStatus.status === 'invalid' ? 'red' : depthStatus.status;
+                depthStatusEl.innerHTML = `<span class="status-indicator-text ${statusClass}">${depthStatus.label}</span>`;
+            } else {
+                depthStatusEl.innerHTML = '';
+            }
+        }
+
+        function closeTireModal() {
+            document.getElementById('tireModal').classList.remove('show');
+            currentModalPosition = null;
+        }
+
+        function saveTireData() {
+            if (currentModalPosition === null) return;
+            
+            const psi = document.getElementById('modal-psi').value;
+            const depth = document.getElementById('modal-depth').value;
+            const model = document.getElementById('modal-model').value;
+            const position = currentModalPosition;
+            
+            // Validate depth max
+            const maxDepth = getMaxDepth(position);
+            if (depth && parseInt(depth) > maxDepth) {
+                showAlert(`Depth cannot exceed ${maxDepth} for this position`, 'error');
+                return;
+            }
+            
+            if (psi || depth || model) {
+                tireData[position] = {
+                    psi: psi,
+                    depth: depth,
+                    model: model
+                };
+            } else {
+                delete tireData[position];
+            }
+            
+            updateVisualDiagram();
+            updateListViewStatus(position);
+            closeTireModal();
+        }
+
+        function updateVisualDiagram() {
+            for (let i = 1; i <= 18; i++) {
+                const visual = document.getElementById(`tire-visual-${i}`);
+                const icon = document.getElementById(`tire-icon-${i}`);
+                
+                if (!visual) continue;
+                
+                const status = getTireStatus(i);
+                
+                // Remove all status classes
+                visual.classList.remove('has-data', 'status-green', 'status-yellow', 'status-red');
+                
+                if (status === 'green') {
+                    visual.classList.add('status-green');
+                    icon.textContent = '✓';
+                } else if (status === 'yellow') {
+                    visual.classList.add('status-yellow');
+                    icon.textContent = '⚠';
+                } else if (status === 'red') {
+                    visual.classList.add('status-red');
+                    icon.textContent = '!';
+                } else if (status === 'blue') {
+                    visual.classList.add('has-data');
+                    icon.textContent = '✓';
+                } else {
+                    icon.textContent = '';
+                }
+            }
+        }
+
+        function updateListViewStatus(position) {
+            const positionEl = document.getElementById(`position-${position}`);
+            if (!positionEl) return;
+            
+            const status = getTireStatus(position);
+            
+            positionEl.classList.remove('status-green', 'status-yellow', 'status-red');
+            
+            if (status === 'green') {
+                positionEl.classList.add('status-green');
+            } else if (status === 'yellow') {
+                positionEl.classList.add('status-yellow');
+            } else if (status === 'red') {
+                positionEl.classList.add('status-red');
+            }
+        }
+
+        function updateTechBadge() {
+            const badge = document.getElementById('techBadge');
+            const nameEl = document.getElementById('techName');
+            
+            if (settings.technicianName) {
+                nameEl.textContent = settings.technicianName;
+                badge.style.display = 'block';
+                document.getElementById('technicianName').value = settings.technicianName;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function handlePhotoSelect(e) {
+            const files = e.target.files;
+            
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        photos.push({
+                            data: e.target.result,
+                            name: file.name,
+                            timestamp: new Date().toISOString()
+                        });
+                        updatePhotoPreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function updatePhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            const count = document.getElementById('photoCount');
+            
+            preview.innerHTML = photos.map((photo, index) => `
+                <div class="photo-item">
+                    <img src="${photo.data}" alt="Photo ${index + 1}">
+                    <button type="button" class="photo-remove" onclick="removePhoto(${index})">×</button>
+                </div>
+            `).join('');
+            
+            count.textContent = photos.length ? `${photos.length} photo${photos.length > 1 ? 's' : ''} attached` : '';
+        }
+
+        function removePhoto(index) {
+            photos.splice(index, 1);
+            updatePhotoPreview();
+        }
+
+        function initializeTirePositions() {
+            const container = document.getElementById('tirePositions');
+            container.innerHTML = '';
+            
+            let startPos = currentVehicle === 'tractor' ? 1 : 11;
+            let endPos = currentVehicle === 'tractor' ? 10 : 18;
+            
+            for (let i = startPos; i <= endPos; i++) {
+                addTirePositionAt(i);
+            }
+        }
+
+        function addTirePositionAt(posNum) {
+            const container = document.getElementById('tirePositions');
+            const models = getModelsForPosition(posNum);
+            const maxDepth = getMaxDepth(posNum);
+            const existing = tireData[posNum] || { psi: '', depth: '', model: '' };
+            
+            let modelOptions = '<option value="">Select Model...</option>';
+            models.forEach(m => {
+                const selected = existing.model === m ? 'selected' : '';
+                modelOptions += `<option value="${m}" ${selected}>${m}</option>`;
+            });
+            
+            const status = getTireStatus(posNum);
+            let statusClass = '';
+            if (status === 'green') statusClass = 'status-green';
+            else if (status === 'yellow') statusClass = 'status-yellow';
+            else if (status === 'red') statusClass = 'status-red';
+            
+            const positionDiv = document.createElement('div');
+            positionDiv.className = `tire-position ${statusClass}`;
+            positionDiv.id = `position-${posNum}`;
+            positionDiv.innerHTML = `
+                <h3>
+                    <div class="position-header">Position ${posNum}: ${positionLabels[posNum] || ''}</div>
+                </h3>
+                <div class="tire-grid">
+                    <div class="form-group">
+                        <label>PSI</label>
+                        <input type="number" id="psi_${posNum}" value="${existing.psi}"
+                               min="0" max="999" 
+                               placeholder="PSI" onchange="handleListInputChange(${posNum})">
+                        <div id="psi-status-${posNum}" class="validation-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Depth (max ${maxDepth})</label>
+                        <input type="number" id="depth_${posNum}" value="${existing.depth}"
+                               min="0" max="${maxDepth}" 
+                               placeholder="Depth" onchange="handleListInputChange(${posNum})">
+                        <div id="depth-status-${posNum}" class="validation-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="model_${posNum}" onchange="handleListInputChange(${posNum})">
+                            ${modelOptions}
+                        </select>
+                    </div>
+                </div>
+            `;
+            container.appendChild(positionDiv);
+            
+            // Update status display
+            updateListPositionStatus(posNum);
+        }
+
+        function handleListInputChange(posNum) {
+            const psi = document.getElementById(`psi_${posNum}`).value;
+            const depth = document.getElementById(`depth_${posNum}`).value;
+            const model = document.getElementById(`model_${posNum}`).value;
+            
+            if (psi || depth || model) {
+                tireData[posNum] = { psi, depth, model };
+            } else {
+                delete tireData[posNum];
+            }
+            
+            updateListPositionStatus(posNum);
+            updateVisualDiagram();
+        }
+
+        function updateListPositionStatus(posNum) {
+            const psi = document.getElementById(`psi_${posNum}`)?.value;
+            const depth = document.getElementById(`depth_${posNum}`)?.value;
+            
+            // Update PSI status
+            const psiStatusEl = document.getElementById(`psi-status-${posNum}`);
+            if (psiStatusEl) {
+                const psiStatus = getPsiStatus(psi);
+                if (psiStatus) {
+                    psiStatusEl.innerHTML = `<span class="status-indicator-text ${psiStatus.status}">${psiStatus.label}</span>`;
+                } else {
+                    psiStatusEl.innerHTML = '';
+                }
+            }
+            
+            // Update Depth status
+            const depthStatusEl = document.getElementById(`depth-status-${posNum}`);
+            if (depthStatusEl) {
+                const depthStatus = getDepthStatus(depth, posNum);
+                if (depthStatus) {
+                    const statusClass = depthStatus.status === 'invalid' ? 'red' : depthStatus.status;
+                    depthStatusEl.innerHTML = `<span class="status-indicator-text ${statusClass}">${depthStatus.label}</span>`;
+                } else {
+                    depthStatusEl.innerHTML = '';
+                }
+            }
+            
+            // Update position card border
+            const positionEl = document.getElementById(`position-${posNum}`);
+            if (positionEl) {
+                const status = getTireStatus(posNum);
+                positionEl.classList.remove('status-green', 'status-yellow', 'status-red');
+                if (status === 'green') positionEl.classList.add('status-green');
+                else if (status === 'yellow') positionEl.classList.add('status-yellow');
+                else if (status === 'red') positionEl.classList.add('status-red');
+            }
+        }
+
+        function clearValidationErrors() {
+            document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+        }
+
+        function validateForm() {
+            clearValidationErrors();
+            let isValid = true;
+            
+            const inspectionDate = document.getElementById('inspectionDate').value;
+            const technicianName = document.getElementById('technicianName').value.trim();
+            const shop = document.getElementById('shop').value;
+            const unitNumber = document.getElementById('unitNumber').value.trim();
+            
+            if (!inspectionDate) {
+                document.getElementById('inspectionDate').classList.add('input-error');
+                document.getElementById('inspectionDateError').textContent = 'Please select an inspection date';
+                isValid = false;
+            }
+            
+            if (!technicianName) {
+                document.getElementById('technicianName').classList.add('input-error');
+                document.getElementById('technicianNameError').textContent = 'Please enter your name';
+                isValid = false;
+            }
+            
+            if (!shop) {
+                document.getElementById('shop').classList.add('input-error');
+                document.getElementById('shopError').textContent = 'Please select a shop location';
+                isValid = false;
+            }
+            
+            if (!unitNumber) {
+                document.getElementById('unitNumber').classList.add('input-error');
+                document.getElementById('unitNumberError').textContent = 'Please enter the unit number';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function saveInspection() {
+            console.log('Save button clicked');
+            
+            if (!validateForm()) {
+                showAlert('Please fill in all required fields', 'error');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            
+            // Sync list view data to tireData if in list view
+            if (currentView === 'grid') {
+                let startPos = currentVehicle === 'tractor' ? 1 : 11;
+                let endPos = currentVehicle === 'tractor' ? 10 : 18;
+                
+                for (let i = startPos; i <= endPos; i++) {
+                    const psi = document.getElementById(`psi_${i}`)?.value || '';
+                    const depth = document.getElementById(`depth_${i}`)?.value || '';
+                    const model = document.getElementById(`model_${i}`)?.value || '';
+                    
+                    if (psi || depth || model) {
+                        tireData[i] = { psi, depth, model };
+                    }
+                }
+            }
+            
+            const inspection = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                inspectionDate: document.getElementById('inspectionDate').value,
+                technician: document.getElementById('technicianName').value.trim(),
+                shop: document.getElementById('shop').value,
+                unitNumber: document.getElementById('unitNumber').value.trim(),
+                stickerShop: document.getElementById('stickerShop').value,
+                stickerDate: document.getElementById('stickerDate').value,
+                notes: document.getElementById('notes').value,
+                positions: [],
+                photos: [...photos],
+                synced: false,
+                syncError: null
+            };
+
+            // Collect tire position data with status
+            Object.keys(tireData).forEach(position => {
+                const data = tireData[position];
+                const pos = parseInt(position);
+                if (data.psi || data.depth || data.model) {
+                    const psiStatus = getPsiStatus(data.psi);
+                    const depthStatus = getDepthStatus(data.depth, pos);
+                    
+                    inspection.positions.push({
+                        position: pos,
+                        psi: data.psi || '',
+                        psiStatus: psiStatus?.label || '',
+                        depth: data.depth || '',
+                        depthStatus: depthStatus?.label || '',
+                        model: data.model || ''
+                    });
+                }
+            });
+
+            console.log('Inspection created:', inspection);
+
+            inspections.push(inspection);
+            saveInspectionsToStorage();
+            
+            showAlert(`✅ Inspection saved for Unit ${inspection.unitNumber}! Ready for next unit.`, 'success');
+            
+            resetForm();
+            updateHistoryDisplay();
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if (navigator.onLine && settings.googleSheetUrl) {
+                syncData();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('unitNumber').value = '';
+            document.getElementById('stickerDate').value = '';
+            document.getElementById('stickerShop').value = '';
+            document.getElementById('stickerDateGroup').style.display = 'block';
+            document.getElementById('notes').value = '';
+            
+            photos = [];
+            updatePhotoPreview();
+            
+            tireData = {};
+            
+            initializeDate();
+            selectVehicle('tractor');
+            updateVisualDiagram();
+            clearValidationErrors();
+            
+            if (settings.technicianName) {
+                document.getElementById('technicianName').value = settings.technicianName;
+            }
+            if (settings.shopLocation) {
+                document.getElementById('shop').value = settings.shopLocation;
+            }
+            
+            document.getElementById('unitNumber').focus();
+        }
+
+        // Settings list rendering
+        function renderSettingsLists() {
+            renderEditableList('shopList', settings.shops || defaultShops, 'shop');
+            renderEditableList('stickerShopList', settings.stickerShops || defaultStickerShops, 'stickerShop');
+            renderEditableList('steerModelList', settings.steerModels || defaultSteerModels, 'steerModel');
+            renderEditableList('driveModelList', settings.driveModels || defaultDriveModels, 'driveModel');
+            renderEditableList('trailerModelList', settings.trailerModels || defaultTrailerModels, 'trailerModel');
+        }
+
+        function renderEditableList(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = items.map((item, index) => `
+                <div class="editable-list-item">
+                    <input type="text" value="${item}" onchange="updateListItem('${type}', ${index}, this.value)">
+                    <button onclick="removeListItem('${type}', ${index})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function updateListItem(type, index, value) {
+            const listMap = {
+                'shop': 'shops',
+                'stickerShop': 'stickerShops',
+                'steerModel': 'steerModels',
+                'driveModel': 'driveModels',
+                'trailerModel': 'trailerModels'
+            };
+            
+            const listName = listMap[type];
+            if (settings[listName]) {
+                settings[listName][index] = value;
+            }
+        }
+
+        function removeListItem(type, index) {
+            const listMap = {
+                'shop': 'shops',
+                'stickerShop': 'stickerShops',
+                'steerModel': 'steerModels',
+                'driveModel': 'driveModels',
+                'trailerModel': 'trailerModels'
+            };
+            
+            const listName = listMap[type];
+            if (settings[listName]) {
+                settings[listName].splice(index, 1);
+                renderSettingsLists();
+            }
+        }
+
+        function addShop() {
+            const input = document.getElementById('newShopInput');
+            if (input.value.trim()) {
+                settings.shops = settings.shops || [...defaultShops];
+                settings.shops.push(input.value.trim());
+                input.value = '';
+                renderSettingsLists();
+            }
+        }
+
+        function addStickerShop() {
+            const input = document.getElementById('newStickerShopInput');
+            if (input.value.trim()) {
+                settings.stickerShops = settings.stickerShops || [...defaultStickerShops];
+                settings.stickerShops.push(input.value.trim());
+                input.value = '';
+                renderSettingsLists();
+            }
+        }
+
+        function addSteerModel() {
+            const input = document.getElementById('newSteerModelInput');
+            if (input.value.trim()) {
+                settings.steerModels = settings.steerModels || [...defaultSteerModels];
+                settings.steerModels.push(input.value.trim());
+                input.value = '';
+                renderSettingsLists();
+            }
+        }
+
+        function addDriveModel() {
+            const input = document.getElementById('newDriveModelInput');
+            if (input.value.trim()) {
+                settings.driveModels = settings.driveModels || [...defaultDriveModels];
+                settings.driveModels.push(input.value.trim());
+                input.value = '';
+                renderSettingsLists();
+            }
+        }
+
+        function addTrailerModel() {
+            const input = document.getElementById('newTrailerModelInput');
+            if (input.value.trim()) {
+                settings.trailerModels = settings.trailerModels || [...defaultTrailerModels];
+                settings.trailerModels.push(input.value.trim());
+                input.value = '';
+                renderSettingsLists();
+            }
+        }
+
+        function resetToDefaults() {
+            if (confirm('Reset all dropdown options to defaults? This cannot be undone.')) {
+                settings.shops = [...defaultShops];
+                settings.stickerShops = [...defaultStickerShops];
+                settings.steerModels = [...defaultSteerModels];
+                settings.driveModels = [...defaultDriveModels];
+                settings.trailerModels = [...defaultTrailerModels];
+                renderSettingsLists();
+                populateDropdowns();
+                saveSettings();
+                showAlert('Dropdown options reset to defaults', 'success');
+            }
+        }
+
+        async function syncData() {
+            if (!settings.googleSheetUrl) {
+                showAlert('Please configure Google Sheet URL in Settings', 'error');
+                return;
+            }
+
+            if (!navigator.onLine) {
+                showAlert('No internet connection. Data will sync when online.', 'info');
+                return;
+            }
+
+            const unsyncedInspections = inspections.filter(i => !i.synced);
+            
+            if (unsyncedInspections.length === 0) {
+                showAlert('All inspections are already synced!', 'info');
+                return;
+            }
+
+            const syncButton = document.getElementById('syncButtonText');
+            const originalText = syncButton.textContent;
+            syncButton.innerHTML = '<span class="loading"></span> Syncing...';
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const inspection of unsyncedInspections) {
+                try {
+                    await fetch(settings.googleSheetUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(inspection)
+                    });
+
+                    const index = inspections.findIndex(i => i.id === inspection.id);
+                    if (index !== -1) {
+                        inspections[index].synced = true;
+                        inspections[index].syncError = null;
+                        inspections[index].syncedAt = new Date().toISOString();
+                    }
+                    successCount++;
+                    
+                } catch (error) {
+                    console.error('Sync error:', error);
+                    const index = inspections.findIndex(i => i.id === inspection.id);
+                    if (index !== -1) {
+                        inspections[index].syncError = error.message;
+                    }
+                    errorCount++;
+                }
+            }
+
+            saveInspectionsToStorage();
+            updateHistoryDisplay();
+            
+            syncButton.textContent = originalText;
+
+            if (errorCount === 0) {
+                showAlert(`Successfully synced ${successCount} inspection(s)!`, 'success');
+            } else {
+                showAlert(`Synced ${successCount}, failed ${errorCount}. Check your connection.`, 'error');
+            }
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (inspections.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>No inspections yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            historyList.innerHTML = inspections
+                .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+                .map(inspection => {
+                    const inspDate = inspection.inspectionDate ? new Date(inspection.inspectionDate).toLocaleDateString() : '';
+                    const badgeClass = inspection.synced ? 'synced' : inspection.syncError ? 'error' : 'pending';
+                    const badgeText = inspection.synced ? 'Synced' : inspection.syncError ? 'Error' : 'Pending';
+                    
+                    const photoCount = inspection.photos ? inspection.photos.length : 0;
+                    const photoText = photoCount > 0 ? ` • ${photoCount} photo${photoCount > 1 ? 's' : ''}` : '';
+                    
+                    return `
+                        <div class="history-item">
+                            <div class="history-info">
+                                <div class="history-unit">Unit ${inspection.unitNumber}</div>
+                                <div class="history-details">
+                                    ${inspDate} • ${inspection.shop} • ${inspection.technician} • ${inspection.positions.length} positions${photoText}
+                                </div>
+                            </div>
+                            <span class="sync-badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                    `;
+                }).join('');
+
+            updatePendingCount();
+        }
+
+        function updatePendingCount() {
+            const pendingCount = inspections.filter(i => !i.synced).length;
+            const countEl = document.getElementById('pendingCount');
+            
+            if (pendingCount > 0) {
+                countEl.textContent = `${pendingCount} pending`;
+                countEl.style.display = 'block';
+            } else {
+                countEl.style.display = 'none';
+            }
+        }
+
+        function updateOnlineStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            if (navigator.onLine) {
+                statusDot.classList.remove('offline');
+                statusText.textContent = 'Online';
+            } else {
+                statusDot.classList.add('offline');
+                statusText.textContent = 'Offline';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function saveInspectionsToStorage() {
+            try {
+                localStorage.setItem('tireInspections', JSON.stringify(inspections));
+            } catch (e) {
+                console.error('Error saving inspections:', e);
+            }
+        }
+
+        function loadInspections() {
+            try {
+                const stored = localStorage.getItem('tireInspections');
+                if (stored) {
+                    inspections = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error('Error loading inspections:', e);
+                inspections = [];
+            }
+        }
+
+        function saveSettings() {
+            try {
+                localStorage.setItem('tireInspectionSettings', JSON.stringify(settings));
+            } catch (e) {
+                console.error('Error saving settings:', e);
+            }
+        }
+
+        function saveSettingsManual() {
+            settings.googleSheetUrl = document.getElementById('googleSheetUrl').value;
+            saveSettings();
+            populateDropdowns();
+            initializeTirePositions();
+            showAlert('Settings saved!', 'success');
+        }
+
+        function loadSettings() {
+            try {
+                const stored = localStorage.getItem('tireInspectionSettings');
+                if (stored) {
+                    const loadedSettings = JSON.parse(stored);
+                    settings = { ...settings, ...loadedSettings };
+                    document.getElementById('googleSheetUrl').value = settings.googleSheetUrl || '';
+                }
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete all local data? This cannot be undone.')) {
+                inspections = [];
+                localStorage.removeItem('tireInspections');
+                updateHistoryDisplay();
+                showAlert('All data cleared', 'success');
+            }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHsKICBzZWxmLnNraXBXYWl0aW5nKCk7Cn0pOwoKc2VsZi5hZGRFdmVudExpc3RlbmVyKCdhY3RpdmF0ZScsIGZ1bmN0aW9uKGV2ZW50KSB7CiAgcmV0dXJuIHNlbGYuY2xpZW50cy5jbGFpbSgpOwp9KTsKCnNlbGYuYWRkRXZlbnRMaXN0ZW5lcignZmV0Y2gnLCBmdW5jdGlvbihldmVudCkgewogIGV2ZW50LnJlc3BvbmRXaXRoKGZldGNoKGV2ZW50LnJlcXVlc3QpKTsKfSk7')
+                .catch(err => console.log('ServiceWorker registration failed:', err));
+        }
+    </script>
+</body>
+</html>
